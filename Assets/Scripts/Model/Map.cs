@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Model
 {
@@ -18,7 +19,8 @@ namespace Model
                     _map[i, j] = new Segment(
                         (i == 0 || j == 0 || i == width - 1 || j == length - 1)
                             ? Segment.SegmentType.Wall
-                            : Segment.SegmentType.Floor);
+                            : Segment.SegmentType.Floor,
+                        new Vector2Int(i, j));
         }
 
         public void Dispose()

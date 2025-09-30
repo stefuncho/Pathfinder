@@ -8,21 +8,26 @@ namespace Behaviours
     public class RaycasterBehaviour : MonoBehaviour
     {
         public event Action<SegmentBehaviour> SegmentSelected;
+        public event Action SelectEnded;
         
         public SegmentBehaviour HighlightedSegment { get; private set; }
         
         protected void Awake()
         {
             _camera = GetComponent<Camera>();
-            _selectReference.action.started += OnSelected;
+            _selectReference.action.started += OnSelectStarted;
+            _selectReference.action.canceled += OnSelectEnded;
+            //_selectReference.action.performed += OnSelectEnded;
         }
 
         protected void OnDestroy()
         {
-            if (_selectReference != null)
-            {
-                _selectReference.action.started -= OnSelected;
-            }
+            if (_selectReference == null) 
+                return;
+            
+            _selectReference.action.started -= OnSelectStarted;
+            _selectReference.action.canceled -= OnSelectEnded;
+            _selectReference.action.performed -= OnSelectEnded;
         }
 
         protected void Update()
@@ -73,6 +78,7 @@ namespace Behaviours
             SegmentSelected?.Invoke(HighlightedSegment);
         }
 
-        private void OnSelected(InputAction.CallbackContext _) => TrySelect();
+        private void OnSelectStarted(InputAction.CallbackContext _) => TrySelect();
+        private void OnSelectEnded(InputAction.CallbackContext _) => SelectEnded?.Invoke();
     }
 }

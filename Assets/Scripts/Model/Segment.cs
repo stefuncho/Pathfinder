@@ -2,15 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 namespace Model
 {
     public class Segment : IDisposable, INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event Action Disposed;
-        
         public enum SegmentType
         {
             Floor = 0,
@@ -19,6 +18,9 @@ namespace Model
             
             MaxIndex,
         }
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+        public event Action Disposed;
 
         public SegmentType Type
         {
@@ -26,9 +28,12 @@ namespace Model
             private set => SetField(ref _type, value);
         }
 
-        public Segment(SegmentType type)
+        public Vector2Int Position { get; }
+
+        public Segment(SegmentType type, Vector2Int position)
         {
             Type = type;
+            Position = position;
         }
 
         public void Dispose()

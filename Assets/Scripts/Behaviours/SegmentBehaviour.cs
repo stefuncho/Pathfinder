@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Model;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class SegmentBehaviour : MonoBehaviour
 {
+    public Vector2Int Position => _segment?.Position ?? Vector2Int.zero;
+    public Segment.SegmentType Type => _segment?.Type ?? default;
+    
     public void Init(Segment segment)
     {
         if (_segment != null)
