@@ -17,7 +17,6 @@ namespace Behaviours
             _camera = GetComponent<Camera>();
             _selectReference.action.started += OnSelectStarted;
             _selectReference.action.canceled += OnSelectEnded;
-            //_selectReference.action.performed += OnSelectEnded;
         }
 
         protected void OnDestroy()
@@ -27,7 +26,6 @@ namespace Behaviours
             
             _selectReference.action.started -= OnSelectStarted;
             _selectReference.action.canceled -= OnSelectEnded;
-            _selectReference.action.performed -= OnSelectEnded;
         }
 
         protected void Update()
