@@ -204,6 +204,7 @@ GameObject:
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
   - component: {fileID: 330585548}
+  - component: {fileID: 330585549}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -364,6 +365,19 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &330585549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78dc8cac086e42639a0edbc93cf015d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _selectReference: {fileID: 2989914284375382229, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -820,6 +834,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraBehaviour: {fileID: 454051528}
+  _raycasterBehaviour: {fileID: 330585549}
   _segmentPrefab: {fileID: 6495199818310099934, guid: a744eb6a035020042aac531540f9962e, type: 3}
   _toggleEditModeReference: {fileID: -3516991770495338145, guid: 052faaac586de48259a63d0c4782560b, type: 3}
 --- !u!1 &2001411001

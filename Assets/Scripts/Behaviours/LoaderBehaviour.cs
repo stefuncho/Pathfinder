@@ -3,6 +3,7 @@ using Model;
 using Services;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 namespace Behaviours
 {
@@ -11,6 +12,8 @@ namespace Behaviours
         protected void Start()
         {
             _toggleEditModeReference.action.performed += OnToggleEditPerformed;
+            _raycasterBehaviour.SegmentSelected += OnSegmentSelected;
+            
             GenerateNewMap();
         }
 
@@ -64,9 +67,8 @@ namespace Behaviours
         private readonly Config _config = new();
         
         [SerializeField] private CameraBehaviour _cameraBehaviour = default;
-
+        [SerializeField] private RaycasterBehaviour _raycasterBehaviour = default;
         [SerializeField] private GameObject _segmentPrefab = default;
-        
         [SerializeField] private InputActionReference _toggleEditModeReference = default;
         
         private bool _isInEditMode = false;
@@ -99,5 +101,16 @@ namespace Behaviours
 
         private void OnToggleEditPerformed(InputAction.CallbackContext obj) 
             => _isInEditMode = !_isInEditMode;
+
+        private void OnSegmentSelected(SegmentBehaviour obj)
+        {
+            if (_isInEditMode)
+            {
+                obj.ToggleSegmentType();
+                return;
+            }
+            
+            // PathFind
+        }
     }
 }

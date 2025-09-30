@@ -182,6 +182,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1422782270832996326}
   - component: {fileID: 2590409288791407861}
+  - component: {fileID: 2456044063376995662}
   m_Layer: 0
   m_Name: Segment
   m_TagString: Untagged
@@ -203,8 +204,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8468273485320744079}
-  - {fileID: 1281021349733937320}
   - {fileID: 5917185373573935529}
+  - {fileID: 1281021349733937320}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2590409288791407861
@@ -219,10 +220,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ad1f8dd55b606c4887298852def826c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _normalColor: {r: 0.6698113, g: 0.6698113, b: 0.6698113, a: 1}
+  _highlightedColor: {r: 0.9245283, g: 0.9245283, b: 0.9245283, a: 1}
+  _inRangeColor: {r: 0.47074375, g: 0.8584906, b: 0.44949272, a: 1}
+  _outRangeColor: {r: 0.8962264, g: 0.5538003, b: 0.5538003, a: 1}
   _visuals:
   - {fileID: 8067953505926620336}
-  - {fileID: 7596396480719424583}
   - {fileID: 4192899391865070538}
+  - {fileID: 7596396480719424583}
+--- !u!65 &2456044063376995662
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6495199818310099934}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 0.02, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7596396480719424583
 GameObject:
   m_ObjectHideFlags: 0
@@ -327,7 +353,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8468273485320744079
 Transform:
   m_ObjectHideFlags: 0
