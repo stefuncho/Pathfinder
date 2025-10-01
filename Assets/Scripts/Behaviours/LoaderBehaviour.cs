@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Model;
 using Services;
 using UnityEngine;
@@ -31,6 +32,8 @@ namespace Behaviours
                 _raycasterBehaviour.SegmentSelected -= OnSegmentSelected;
                 _raycasterBehaviour.SelectEnded -= OnSegmentSelectEnded;
             }
+
+            _lastPath = null;
         }
 
         protected void Update()
@@ -44,31 +47,30 @@ namespace Behaviours
 
         protected void OnGUI()
         {
-            if (_isInEditMode)
+            if (!_isInEditMode)
             {
-                GUILayout.Label("EDIT MODE");
-                
-                GUILayout.Label("Move Range");
-                uint.TryParse(GUILayout.TextField(_config.MoveRange.ToString()), out _config.MoveRange);
-                GUILayout.Label("Attack Range");
-                uint.TryParse(GUILayout.TextField(_config.AttackRange.ToString()), out _config.AttackRange);
-                
-                using (new GUILayout.VerticalScope("box"))
-                {
-                    GUILayout.Label("Map Width:");
-                    uint.TryParse(GUILayout.TextField(_config.MapWidth.ToString()), out _config.MapWidth);
-                    GUILayout.Label("Map Length:");
-                    uint.TryParse(GUILayout.TextField(_config.MapLength.ToString()), out _config.MapLength);
-                    
-                    if (_config.MapWidth < 4 || _config.MapLength < 4)
-                        GUILayout.Label("Minimal Map Size is 4x4");
-                    else if (GUILayout.Button("Generate Map"))
-                        _newMapRequested = true;
-                }
+                GUILayout.Label("Press F2 for Edit Mode");
+                return;
             }
-            else
+
+            GUILayout.Label("EDIT MODE");
+
+            GUILayout.Label("Move Range");
+            uint.TryParse(GUILayout.TextField(_config.MoveRange.ToString()), out _config.MoveRange);
+            GUILayout.Label("Attack Range");
+            uint.TryParse(GUILayout.TextField(_config.AttackRange.ToString()), out _config.AttackRange);
+
+            using (new GUILayout.VerticalScope("box"))
             {
-                GUILayout.Label("Press F2 for Camera Mode");
+                GUILayout.Label("Map Width:");
+                uint.TryParse(GUILayout.TextField(_config.MapWidth.ToString()), out _config.MapWidth);
+                GUILayout.Label("Map Length:");
+                uint.TryParse(GUILayout.TextField(_config.MapLength.ToString()), out _config.MapLength);
+
+                if (_config.MapWidth < 4 || _config.MapLength < 4)
+                    GUILayout.Label("Minimal Map Size is 4x4");
+                else if (GUILayout.Button("Generate Map"))
+                    _newMapRequested = true;
             }
         }
 
@@ -95,6 +97,8 @@ namespace Behaviours
         private CharacterType? _draggedCharacter = null;
         
         private Vector2Int[] _characterPosition = new Vector2Int[2];
+        
+        private IReadOnlyList<Segment> _lastPath;
 
         private ICameraService CameraService => _cameraBehaviour;
 
@@ -131,47 +135,93 @@ namespace Behaviours
             _characterPosition[(int)character] = position;
         }
 
-        private void OnToggleEditPerformed(InputAction.CallbackContext obj) 
-            => _isInEditMode = !_isInEditMode;
-        
+        private void ReplacePath(IReadOnlyList<Segment> path, MapPathfinder.PathType pathType)
+        {
+            if (_lastPath != null)
+                TryClearPath();
+            
+            _lastPath = path;
+            
+            var range = (pathType == MapPathfinder.PathType.Move)
+                ? _config.MoveRange
+                : _config.AttackRange;
+            
+            for (var index = 0; index < _lastPath.Count; index++)
+            {
+                var segment = _lastPath[index];
+                var colorType = (index <= range)
+                    ? Segment.ColorType.InRange
+                    : Segment.ColorType.OutOfRange;
+                
+                segment.Color = colorType;
+            }
+        }
+
+        private void TryClearPath()
+        {
+            if (_lastPath == null)
+                return;
+            
+            foreach (var segment in _lastPath)
+            {
+                segment.Color = Segment.ColorType.Normal;
+            }
+            
+            _lastPath = null;
+        }
+
+        private void OnToggleEditPerformed(InputAction.CallbackContext obj)
+        {
+            _isInEditMode = !_isInEditMode;
+            TryClearPath();
+        }
+
 
         private void OnSegmentSelectEnded() 
             => _draggedCharacter = null;
 
         private void OnSegmentSelected(SegmentBehaviour obj)
         {
-            if (_isInEditMode)
+            if (!_isInEditMode)
             {
-                if (_draggedCharacter == null)
+                var pathType = (obj.Position == _characterPosition[(int)CharacterType.Enemy])
+                    ? MapPathfinder.PathType.Attack
+                    : MapPathfinder.PathType.Move;
+                
+                var path = MapPathfinder.FindPath(_map, pathType,
+                    start: _characterPosition[(int)CharacterType.Player],
+                    end: obj.Position);
+
+                ReplacePath(path, pathType);
+                return;
+            }
+
+            if (_draggedCharacter == null)
+            {
+                if (obj.Position == _characterPosition[(int)CharacterType.Player])
                 {
-                    if (obj.Position == _characterPosition[(int)CharacterType.Player])
-                    {
-                        _draggedCharacter = CharacterType.Player;
-                        return;
-                    }
-                    
-                    if (obj.Position == _characterPosition[(int)CharacterType.Enemy])
-                    {
-                        _draggedCharacter = CharacterType.Enemy;
-                        return;
-                    }
-                    
-                    obj.ToggleSegmentType();
+                    _draggedCharacter = CharacterType.Player;
                     return;
                 }
 
-                if (obj.Type != Segment.SegmentType.Floor
-                    || obj.Position == _characterPosition[(int)CharacterType.Player]
-                    || obj.Position == _characterPosition[(int)CharacterType.Enemy])
+                if (obj.Position == _characterPosition[(int)CharacterType.Enemy])
                 {
+                    _draggedCharacter = CharacterType.Enemy;
                     return;
                 }
-                    
-                SetPosition(_draggedCharacter.Value, obj.Position);
+
+                obj.ToggleSegmentType();
                 return;
             }
-            
-            // PathFind
+
+            if (obj.Type != Segment.SegmentType.Floor
+                || obj.Position == _characterPosition[(int)CharacterType.Player]
+                || obj.Position == _characterPosition[(int)CharacterType.Enemy])
+            {
+                return;
+            }
+
+            SetPosition(_draggedCharacter.Value, obj.Position);
         }
     }
 }

@@ -24,12 +24,8 @@ public class SegmentBehaviour : MonoBehaviour
 
     public void SetHighlight(bool tf)
     {
-        var renderers = transform.GetComponentsInChildren<Renderer>(includeInactive: true);
-
-        foreach (var renderer in renderers)
-        {
-            renderer.material.SetColor("_BaseColor", tf ? _highlightedColor : _normalColor);
-        }
+        _isHighlighted = tf;
+        UpdateColor();
     }
 
     public void ToggleSegmentType()
@@ -52,17 +48,24 @@ public class SegmentBehaviour : MonoBehaviour
     [SerializeField] private List<GameObject> _visuals = new();
 
     private Segment _segment;
-
-    private void OnSegmentDisposed()
-    {
-        _segment.Disposed -= OnSegmentDisposed;
-        _segment.PropertyChanged -= OnSegmentPropertyChanged;
-        Destroy(gameObject);
-    }
+    private bool _isHighlighted;
 
     private void UpdateColor()
     {
+        var color = (_isHighlighted, _segment.Color) switch
+        {
+            (true, _) => _highlightedColor,
+            (false, Segment.ColorType.InRange) => _inRangeColor,
+            (false, Segment.ColorType.OutOfRange) => _outRangeColor,
+            _ => _normalColor,
+        };
         
+        var renderers = transform.GetComponentsInChildren<Renderer>(includeInactive: true);
+
+        foreach (var renderer in renderers)
+        {
+            renderer.material.SetColor("_BaseColor", color);
+        }
     }
 
     private void UpdateType()
@@ -73,9 +76,19 @@ public class SegmentBehaviour : MonoBehaviour
         }
     }
 
+    private void OnSegmentDisposed()
+    {
+        _segment.Disposed -= OnSegmentDisposed;
+        _segment.PropertyChanged -= OnSegmentPropertyChanged;
+        Destroy(gameObject);
+    }
+
     private void OnSegmentPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(_segment.Type))
             UpdateType();
+        
+        if (e.PropertyName == nameof(_segment.Color))
+            UpdateColor();
     }
 }

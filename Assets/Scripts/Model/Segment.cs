@@ -19,6 +19,15 @@ namespace Model
             MaxIndex,
         }
         
+        public enum ColorType
+        {
+            Normal = 0,
+            InRange,
+            OutOfRange,
+            
+            MaxIndex,
+        }
+        
         public event PropertyChangedEventHandler PropertyChanged;
         public event Action Disposed;
 
@@ -26,6 +35,12 @@ namespace Model
         {
             get => _type; 
             private set => SetField(ref _type, value);
+        }
+
+        public ColorType Color
+        {
+            get => _color; 
+            set => SetField(ref _color, value);
         }
 
         public Vector2Int Position { get; }
@@ -45,6 +60,7 @@ namespace Model
             => Type = (SegmentType)(((int)Type + 1) % (int)SegmentType.MaxIndex);
         
         private SegmentType _type;
+        private ColorType _color;
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
